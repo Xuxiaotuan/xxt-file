@@ -281,3 +281,16 @@ body {
 .context-menu-content button:last-child:hover {
   background: #c82333;
 }
+
+.auto-complete-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.auto-complete-item.selected {
+  background-color: #f0f0f0;
+}

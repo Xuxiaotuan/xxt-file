@@ -195,6 +195,41 @@ fn auto_complete_path(partial_path: String) -> Result<Vec<String>, String> {
     Ok(results)
 }
 
+#[command]
+fn read_file_content(path: String) -> Result<String, String> {
+    let path = Path::new(&path);
+    if !path.exists() {
+        return Err("File does not exist".to_string());
+    }
+    if path.is_dir() {
+        return Err("Cannot read directory".to_string());
+    }
+    fs::read_to_string(path).map_err(|e| e.to_string())
+}
+
+#[command]
+fn get_file_type(path: String) -> Result<String, String> {
+    let path = Path::new(&path);
+    if !path.exists() {
+        return Err("File does not exist".to_string());
+    }
+    if path.is_dir() {
+        return Ok("directory".to_string());
+    }
+    let extension = path.extension().and_then(|ext| ext.to_str()).unwrap_or("");
+    match extension.to_lowercase().as_str() {
+        "jpg" | "jpeg" | "png" | "gif" => Ok("image".to_string()),
+        "pdf" => Ok("pdf".to_string()),
+        "txt" => Ok("text".to_string()),
+        _ => Ok("unknown".to_string()),
+    }
+}
+
+#[command]
+fn read_file_binary(path: String) -> Result<Vec<u8>, String> {
+    fs::read(&path).map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -202,6 +237,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_home_directory,
             get_total_size,
+            read_file_content,
+            read_file_binary,
             list_files,
             delete_file,
             rename_file,
